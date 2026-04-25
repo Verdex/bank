@@ -13,6 +13,11 @@
 // stdin
 
 
+use std::io;
+
 fn main() {
-    println!("Hello, world!");
+    let input = io::read_to_string(io::stdin()).expect("reading stream failed");
+    print!("{}", input);
+
+
 }
