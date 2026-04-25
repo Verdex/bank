@@ -30,6 +30,7 @@ fn find_bank() {
         let w = x.path();
         if w.is_dir() && let Some(name) = w.file_name() && name == ".bank" {
             println!("{}", w.display());
+        
         }
     }
 }
