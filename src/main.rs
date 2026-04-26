@@ -1,31 +1,20 @@
 
-// get time
-// take arg 2 if it exists 
-// are there any files in .bank? no then make one and dump the info into it
-// if files are here, then find the youngest one, if it's sufficiently small then append to it
-// finished
-//
-// ===========================
-// arg 2
-// date
-// stdin
-
 use std::env;
 use std::io::{self, Write};
 use std::fs::{self, OpenOptions, File};
 use std::path::PathBuf;
 use std::time::{ SystemTime, UNIX_EPOCH };
 
-const MAX_REPO_SIZE : u64 = 10; 
+const MAX_REPO_SIZE : u64 = 1_048_576; 
 
 fn main() {
     let input = io::read_to_string(io::stdin()).expect("reading stream failed");
-    print!("{}", input); // TODO println?
+    print!("{}", input); 
 
     let bank_dir = find_bank().expect("couldn't find .bank directory");
     let mut repo = find_next_repo(bank_dir).expect("failure finding next repo");
 
-    writeln!(repo, "================").expect("failure writing divider");
+    writeln!(repo, "==================================================").expect("failure writing divider");
     writeln!(repo, "{}", epoch()).expect("failure writing time");
     
     for arg in env::args().skip(1) {
