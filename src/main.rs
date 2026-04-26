@@ -24,12 +24,12 @@ fn main() {
 
 fn find_bank() {
 
-    let blarg = fs::read_dir(".").expect("couldn't open current directory");
-    for x in blarg {
-        let x = x.unwrap();
-        let w = x.path();
-        if w.is_dir() && let Some(name) = w.file_name() && name == ".bank" {
-            println!("{}", w.display());
+    let dir = fs::read_dir(".").expect("couldn't open current directory");
+    for f in dir {
+        let f = f.unwrap();
+        let f = f.path();
+        if f.is_dir() && let Some(name) = f.file_name() && name == ".bank" {
+            println!("{}", f.display());
         
         }
     }
