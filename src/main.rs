@@ -62,12 +62,12 @@ fn find_next_repo(mut bank : PathBuf) -> io::Result<File> {
                 OpenOptions::new().write(true).append(true).open(x.0)
             }
             else {
-                bank.push(format!("{}", SystemTime::now().duration_since(UNIX_EPOCH).expect("time name failure").as_secs()));
+                bank.push(epoch());
                 OpenOptions::new().write(true).create_new(true).open(bank)
             }
         },
         None => { 
-            bank.push(format!("{}", SystemTime::now().duration_since(UNIX_EPOCH).expect("time name failure").as_secs()));
+            bank.push(epoch());
             OpenOptions::new().write(true).create_new(true).open(bank)
         }
     }
