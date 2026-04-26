@@ -66,15 +66,18 @@ fn find_next_repo(mut bank : PathBuf) -> io::Result<PathBuf> {
     }
 }
 
-fn find_bank() {
+fn find_bank() -> io::Result<PathBuf> {
+    let mut target = PathBuf::new();
+    target.push(".");
 
-    let dir = fs::read_dir(".").expect("couldn't open current directory");
-    for f in dir {
-        let f = f.unwrap();
-        let f = f.path();
-        if f.is_dir() && let Some(name) = f.file_name() && name == ".bank" {
-            println!("{}", f.display());
-        
+    loop {
+        let dir = fs::read_dir(&target)?;
+        for f in dir {
+            let f = f?.path();
+            if f.is_dir() && let Some(name) = f.file_name() && name == ".bank" {
+                return Ok(f);
+            }
         }
+        target.push("..");
     }
 }
