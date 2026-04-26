@@ -11,27 +11,31 @@
 // stdin
 
 use std::env;
-use std::io;
-use std::fs;
+use std::io::{self, Write};
+use std::fs::{self, OpenOptions, File};
 use std::path::PathBuf;
 use std::time::{ SystemTime, UNIX_EPOCH };
 
-const MAX_REPO_SIZE : u64 =10; 
+const MAX_REPO_SIZE : u64 = 10; 
 
 fn main() {
     let input = io::read_to_string(io::stdin()).expect("reading stream failed");
     print!("{}", input); // TODO println?
 
     let bank_dir = find_bank().expect("couldn't find .bank directory");
+    let mut repo = find_next_repo(bank_dir).expect("failure finding next repo");
 
-    let args = env::args().collect::<Vec<_>>();
-    if args.len() > 1 {
-
+    writeln!(repo, "================").expect("failure writing divider");
+    writeln!(repo, "{}", epoch()).expect("failure writing time");
+    
+    for arg in env::args().skip(1) {
+        writeln!(repo, "{}", arg).expect("failure writing meta");
     }
 
+    writeln!(repo, "{}", input).expect("failure writing data");
 }
 
-fn find_next_repo(mut bank : PathBuf) -> io::Result<PathBuf> {
+fn find_next_repo(mut bank : PathBuf) -> io::Result<File> {
     fn to_time(x:PathBuf) -> (PathBuf, u64) {
         let time = match fs::metadata(&x) {
             Ok(m) => match m.created() {
@@ -49,22 +53,22 @@ fn find_next_repo(mut bank : PathBuf) -> io::Result<PathBuf> {
         .map(|x| x.path())
         .filter(|x| x.is_file())
         .map(to_time)
-        .max_by_key(|(p, t)| *t);
+        .max_by_key(|(_, t)| *t);
 
     match result { 
         Some(x) => {
             let m = fs::metadata(&x.0)?;
             if m.len() <= MAX_REPO_SIZE {
-                Ok(x.0)
+                OpenOptions::new().write(true).append(true).open(x.0)
             }
             else {
                 bank.push(format!("{}", SystemTime::now().duration_since(UNIX_EPOCH).expect("time name failure").as_secs()));
-                Ok(bank)
+                OpenOptions::new().write(true).create_new(true).open(bank)
             }
         },
         None => { 
             bank.push(format!("{}", SystemTime::now().duration_since(UNIX_EPOCH).expect("time name failure").as_secs()));
-            Ok(bank)
+            OpenOptions::new().write(true).create_new(true).open(bank)
         }
     }
 }
@@ -83,4 +87,8 @@ fn find_bank() -> io::Result<PathBuf> {
         }
         target.push("..");
     }
+}
+
+fn epoch() -> String {
+    format!("{}", SystemTime::now().duration_since(UNIX_EPOCH).expect("time failure").as_secs())
 }
