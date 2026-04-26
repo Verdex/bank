@@ -1,5 +1,4 @@
 
-// search upward for .bank directory indicate failure if it's not there
 // get time
 // take arg 2 if it exists 
 // are there any files in .bank? no then make one and dump the info into it
@@ -11,9 +10,13 @@
 // date
 // stdin
 
+use std::env;
 use std::io;
 use std::fs;
-use std::path::Path;
+use std::path::PathBuf;
+use std::time::{ SystemTime, UNIX_EPOCH };
+
+const MAX_REPO_SIZE : u64 =10; 
 
 fn main() {
     let input = io::read_to_string(io::stdin()).expect("reading stream failed");
